@@ -80,6 +80,12 @@ jobs:
           EOF
           python create_models.py
 
+      - name: Verify models directory structure
+        run: |
+          echo "Models directory structure:"
+          find models/ -type f -name "*.pkl" || echo "No .pkl files found"
+          ls -la models/
+
       - name: Build Docker images
         run: |
           docker compose build --no-cache
