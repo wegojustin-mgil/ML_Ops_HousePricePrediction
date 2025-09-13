@@ -45,18 +45,18 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker-compose build --no-cache
+          docker compose build --no-cache
 
       - name: Start services
         run: |
-          docker-compose up -d
+          docker compose up -d
           echo "Waiting for services to be ready..."
           sleep 30
 
       - name: Check service health
         run: |
           # Check if all services are running
-          docker-compose ps
+          docker compose ps
           
           # Check MLflow health
           curl -f http://localhost:5555 || exit 1
@@ -89,25 +89,25 @@ jobs:
       - name: Run integration tests
         run: |
           # Check if services can communicate
-          docker-compose exec -T fastapi curl -f http://mlflow:5000 || true
+          docker compose exec -T fastapi curl -f http://mlflow:5000 || true
           echo "Service communication test completed"
 
       - name: Check logs for errors
         if: always()
         run: |
           echo "=== MLflow Logs ==="
-          docker-compose logs mlflow | tail -50
+          docker compose logs mlflow | tail -50
           
           echo "=== FastAPI Logs ==="
-          docker-compose logs fastapi | tail -50
+          docker compose logs fastapi | tail -50
           
           echo "=== Streamlit Logs ==="
-          docker-compose logs streamlit | tail -50
+          docker compose logs streamlit | tail -50
 
       - name: Stop services
         if: always()
         run: |
-          docker-compose down -v
+          docker compose down -v
 
   push-to-registry:
     needs: build-and-test
