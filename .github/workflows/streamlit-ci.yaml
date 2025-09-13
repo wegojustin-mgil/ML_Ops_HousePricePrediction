@@ -10,22 +10,27 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to DockerHub Container Registry
+      # Use a single source of truth for username
+      - name: Set env
+        run: echo "DOCKERHUB_USERNAME=wegojustin" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: docker.io
-          username: wegojustin
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ env.DOCKERHUB_USERNAME }}   # <- guaranteed present
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  # <- must exist in repo secrets
+          # registry is optional for Docker Hub; omit to reduce variables
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./streamlit_app
           push: true
-          tags: docker.io/${{ vars.DOCKERHUB_USERNAME }}/streamlit:latest
+          tags: docker.io/${{ env.DOCKERHUB_USERNAME }}/streamlit:latest
+
