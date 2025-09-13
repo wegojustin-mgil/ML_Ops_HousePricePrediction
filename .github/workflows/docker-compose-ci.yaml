@@ -175,13 +175,13 @@ jobs:
 
       - name: Debug environment variables
         run: |
-          echo "DockerHub username: ${{ vars.DOCKERHUB_USERNAME }}"
+          echo "Username exists: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
           echo "Token exists: ${{ secrets.DOCKERHUB_TOKEN != '' }}"
 
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push FastAPI image
@@ -191,8 +191,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/fastapi:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/fastapi:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi:${{ github.sha }}
 
       - name: Build and push Streamlit image
         uses: docker/build-push-action@v5
@@ -201,12 +201,12 @@ jobs:
           file: ./streamlit_app/Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/streamlit:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/streamlit:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/streamlit:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/streamlit:${{ github.sha }}
 
       - name: Create deployment info
         run: |
           echo "Images pushed successfully:"
-          echo "- ${{ vars.DOCKERHUB_USERNAME }}/fastapi:${{ github.sha }}"
-          echo "- ${{ vars.DOCKERHUB_USERNAME }}/streamlit:${{ github.sha }}"
+          echo "- ${{ secrets.DOCKERHUB_USERNAME }}/fastapi:${{ github.sha }}"
+          echo "- ${{ secrets.DOCKERHUB_USERNAME }}/streamlit:${{ github.sha }}"
           echo "Deploy using: docker-compose up -d"
