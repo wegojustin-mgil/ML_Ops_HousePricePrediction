@@ -1,0 +1,68 @@
+services:
+  # MLflow tracking server for experiment tracking
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5555:5000"
+    command: mlflow server --host 0.0.0.0 --backend-store-uri sqlite:///mlflow.db --default-artifact-root /mlflow/artifacts
+    volumes:
+      - ./mlflow_data:/mlflow
+    networks:
+      - ml-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # FastAPI service for model inference
+  fastapi:
+    image: wegojustin/fastapi:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro  # Mount models directory as read-only
+      - ./data:/app/data:ro       # Mount data directory as read-only
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    networks:
+      - ml-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Streamlit UI for user interaction
+  streamlit:
+    image: wegojustin/streamlit:dev
+    build:
+      context: ./streamlit_app
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://fastapi:8000
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - fastapi
+      - mlflow
+    networks:
+      - ml-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  ml-network:
+    driver: bridge
+
+volumes:
+  mlflow_data:

@@ -104,9 +104,9 @@ if __name__ == "__main__":
     import argparse
     
     parser = argparse.ArgumentParser(description='Feature engineering for housing data.')
-    parser.add_argument('--input', required=True, help='Path to cleaned CSV file')
-    parser.add_argument('--output', required=True, help='Path for output CSV file (engineered features)')
-    parser.add_argument('--preprocessor', required=True, help='Path for saving the preprocessor')
+    parser.add_argument('--input', default='data/processed/cleaned_house_data.csv', help='Path to cleaned CSV file')
+    parser.add_argument('--output', default='data/processed/engineered_features.csv', help='Path for output CSV file (engineered features)')
+    parser.add_argument('--preprocessor', default='models/preprocessor.pkl', help='Path for saving the preprocessor')
     
     args = parser.parse_args()
     

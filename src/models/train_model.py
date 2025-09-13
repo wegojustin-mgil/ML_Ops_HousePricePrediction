@@ -26,10 +26,10 @@ logger = logging.getLogger(__name__)
 # -----------------------------
 def parse_args():
     parser = argparse.ArgumentParser(description="Train and register final model from config.")
-    parser.add_argument("--config", type=str, required=True, help="Path to model_config.yaml")
-    parser.add_argument("--data", type=str, required=True, help="Path to processed CSV dataset")
-    parser.add_argument("--models-dir", type=str, required=True, help="Directory to save trained model")
-    parser.add_argument("--mlflow-tracking-uri", type=str, default=None, help="MLflow tracking URI")
+    parser.add_argument("--config", type=str, default="configs/model_config.yaml", help="Path to model_config.yaml")
+    parser.add_argument("--data", type=str, default="data/processed/engineered_features.csv", help="Path to processed CSV dataset")
+    parser.add_argument("--models-dir", type=str, default="models", help="Directory to save trained model")
+    parser.add_argument("--mlflow-tracking-uri", type=str, default="http://localhost:5555", help="MLflow tracking URI")
     return parser.parse_args()
 
 # -----------------------------
